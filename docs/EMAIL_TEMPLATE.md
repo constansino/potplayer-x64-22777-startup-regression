@@ -30,7 +30,7 @@ I also sampled the hot startup thread. In the slow build, it stays for several s
 
 Public report:
 
-- Repository: `REPO_URL`
+- Repository: `https://github.com/constansino/potplayer-x64-22777-startup-regression`
 - PR / report URL: `PR_URL`
 
 Could you please route this to the PotPlayer x64 engineering / release team and check whether `1.7.22777.0` introduced a protected-loader startup regression?
