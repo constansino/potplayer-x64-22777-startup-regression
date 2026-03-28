@@ -1,0 +1,67 @@
+Hello Kakao team,
+Please forward this report to the PotPlayer x64 engineering / release team.
+
+안녕하세요.
+이 메일을 PotPlayer x64 개발팀 또는 릴리스 담당 엔지니어에게 전달해 주시면 감사하겠습니다.
+
+I am reporting a reproducible startup regression in PotPlayer x64.
+PotPlayer x64 시작 속도 회귀 문제를 제보드립니다.
+
+Environment / 환경:
+- Windows 10 Pro 25H2, build 26200.8039, x64
+
+Affected files / 비교 대상:
+- Fast build: PotPlayer64.dll 1.7.22775.0
+- Slow build: PotPlayer64.dll 1.7.22777.0
+- PotPlayerMini64.exe is unchanged between the compared installs.
+- Both DLLs are officially signed by Kakao Corp.
+
+Measured startup time / 측정 결과:
+- 1.7.22777.0: first visible main window appears in about 9.2s to 9.6s
+- 1.7.22775.0: first visible main window appears in about 0.65s to 0.85s
+
+I isolated the issue by replacing only PotPlayer64.dll in the same install directory.
+같은 설치 경로에서 PotPlayer64.dll 파일만 교체하여 문제를 분리 확인했습니다.
+
+Swap test / 교체 테스트:
+- baseline with 22777: 9510 ms
+- swap only to 22775: 771 ms
+- restore 22777: 9626 ms
+
+This points directly to a regression in PotPlayer64.dll 1.7.22777.0.
+즉, 문제의 핵심은 PotPlayer64.dll 1.7.22777.0 자체의 회귀로 보입니다.
+
+I also sampled the hot startup thread during the delay.
+The slow build spends several seconds inside the virtualized .themida region of PotPlayer64.dll, around module offset +0x1C1F2AE, before the first visible window appears.
+The fast build passes through the protected region quickly and reaches normal GUI initialization.
+
+지연 구간에서 핫 스레드도 샘플링했습니다.
+느린 빌드는 첫 화면이 뜨기 전까지 PotPlayer64.dll 의 가상화된 .themida 구간, 대략 모듈 오프셋 +0x1C1F2AE 부근에서 수 초 동안 머뭅니다.
+반면 빠른 빌드는 해당 보호 구간을 짧게 통과한 뒤 정상적인 GUI 초기화 단계로 넘어갑니다.
+
+Other likely causes were tested and ruled out as the primary factor:
+- user config
+- playlist
+- auto-update settings
+- firewall / proxy
+- LAV Filters / madVR
+
+다음 항목들은 주된 원인으로 보이지 않았습니다:
+- 사용자 설정
+- 재생 목록
+- 자동 업데이트 설정
+- 방화벽 / 프록시
+- LAV Filters / madVR
+
+Public report / 공개 보고서:
+- Repository: https://github.com/constansino/potplayer-x64-22777-startup-regression
+- PR / report URL: https://github.com/constansino/potplayer-x64-22777-startup-regression/pull/1
+
+Could you please check whether PotPlayer64.dll 1.7.22777.0 introduced a protected-loader startup regression in the x64 build?
+If possible, please route this report to the PotPlayer x64 developer responsible for startup / protection initialization.
+
+PotPlayer64.dll 1.7.22777.0 에서 x64 빌드의 보호 로더 또는 초기화 단계 회귀가 들어갔는지 확인 부탁드립니다.
+가능하다면 시작 초기화 / 보호 로직 담당 개발자에게 직접 전달 부탁드립니다.
+
+Thank you.
+감사합니다.
